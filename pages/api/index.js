@@ -62,7 +62,6 @@ async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitField
             if (docSnap.exists()){
                 data[docSnap.id] = await getFields(docSnap, includeFieldsArray, omitFieldsArray)
 }
-            else  data[docSnap.id] = "propertyID not found: " + propertyIDArray[propertyID]
         }
         }
     return data
