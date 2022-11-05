@@ -2,12 +2,13 @@ import { collection, getDocs , doc, getDoc} from "firebase/firestore";
 import {db} from "../../public/firebase";
 export default async function handler(req, res){
 
-//    if(req.method === "POST") {
-//
-//    }
-//    if(req.method === "PUT") {
-//
-//    } d
+    if(req.method === "POST") {
+        res.status(200).json("POST ME IF YOU CAN!")
+
+    }
+    if(req.method === "PUT") {
+        res.status(200).json("PUT ME IF YOU CAN!")
+    }
     const {includefields, omitfields, propertyid} = req.headers
 
     let propertyIDArray = []
