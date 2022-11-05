@@ -22,19 +22,37 @@ export default async function handler(req, res){
     if(typeof includefields != "undefined") includeFieldsArray = includefields.split(',')
     if(typeof includepayments != "undefined") includePayments = true
 
-
-
     let returnObj = await getAppropriateDocs(propertyIDArray, includeFieldsArray,omitFieldsArray, includePayments )
 
     res.status(200).json(returnObj)
 
 }
 
+async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitFieldsArray, includePayments){
+    let data = {}
+
+    if(propertyIDArray.length === 0) {
+        // GET ALL DOCS IN /UNITS
+        const querySnapshot = await getDocs(collection(db, "units"));
+        querySnapshot.forEach(async (doc) => {
+            data[doc.id] = await getFields(doc, includeFieldsArray, omitFieldsArray, includePayments)
+        });
+    } else {
+        // GET SPECIFIED DOCS
+        for(let propertyID in propertyIDArray) {
+            const docRef = doc(db, "units", propertyIDArray[propertyID]);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()){
+                data[docSnap.id] = await getFields(docSnap, includeFieldsArray, omitFieldsArray, includePayments)
+}
+        }
+        }
+    return data
+}
+
+
 async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayments) {
-
-
     let returnObj = {}
-
     if (includeFieldsArray.length !== 0) {
         // GET SPECIFIED FIELDS
         for(let elem in includeFieldsArray) {
@@ -43,7 +61,6 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayme
     } else {
         returnObj = doc.data()
     }
-
     // add payments to obj
     if (includePayments) {
         const paymentsCol =collection(db, "units/"+doc.id+"/payments")
@@ -78,26 +95,4 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayme
     }
 
     return returnObj
-}
-
-async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitFieldsArray, includePayments){
-    let data = {}
-
-    if(propertyIDArray.length === 0) {
-        // GET ALL DOCS IN /UNITS
-        const querySnapshot = await getDocs(collection(db, "units"));
-        querySnapshot.forEach(async (doc) => {
-            data[doc.id] = await getFields(doc, includeFieldsArray, omitFieldsArray, includePayments)
-        });
-    } else {
-        // GET SPECIFIED DOCS
-        for(let propertyID in propertyIDArray) {
-            const docRef = doc(db, "units", propertyIDArray[propertyID]);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()){
-                data[docSnap.id] = await getFields(docSnap, includeFieldsArray, omitFieldsArray, includePayments)
-}
-        }
-        }
-    return data
 }
