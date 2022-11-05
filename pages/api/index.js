@@ -1,4 +1,4 @@
-import { collection, getDocs , doc, getDoc} from "firebase/firestore";
+import { collection, getDocs , doc, getDoc, query, where} from "firebase/firestore";
 import {db} from "../../public/firebase";
 export default async function handler(req, res){
 
@@ -23,6 +23,7 @@ export default async function handler(req, res){
     if(typeof includepayments != "undefined") includePayments = true
 
 
+
     let returnObj = await getAppropriateDocs(propertyIDArray, includeFieldsArray,omitFieldsArray, includePayments )
 
     res.status(200).json(returnObj)
@@ -45,11 +46,28 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayme
 
     // add payments to obj
     if (includePayments) {
-        const querySnapshot = await getDocs(collection(db, "units/"+doc.id+"/payments"));
+        const paymentsCol =collection(db, "units/"+doc.id+"/payments")
+        const unpaidSnapshot = await getDocs(query(paymentsCol, where("status", "==", "unpaid")));
         let payments = {}
-        querySnapshot.forEach((paymentDoc) => {
-            payments[paymentDoc.id] = paymentDoc.data()
+        let unpaid = {}
+        unpaidSnapshot.forEach((paymentDoc) => {
+            unpaid[paymentDoc.id] = paymentDoc.data()
         });
+        payments["unpaid"] = unpaid
+
+        let processing = {}
+        const processingSnapshot = await getDocs(query(paymentsCol, where("status", "==", "unpaid")));
+        processingSnapshot.forEach((paymentDoc) => {
+            unpaid[paymentDoc.id] = paymentDoc.data()
+        });
+        payments["processing"] = processing
+        let paid = {}
+        const paidSnapshot =  await getDocs(query(paymentsCol, where("paid", "==", true)));
+        paidSnapshot.forEach((paymentDoc) => {
+            unpaid[paymentDoc.id] = paymentDoc.data()
+        });
+        payments["paid"] = paid
+
         returnObj["payments"] = payments
     }
 
