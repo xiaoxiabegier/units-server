@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs } from "firebase/firestore";
 
-export async function handler(req, res) {
+export default async function handler(req, res) {
     const {includefields, omitfields, propertyid} = req.headers
 
     let includeFieldsArray = []
