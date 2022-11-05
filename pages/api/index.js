@@ -79,7 +79,7 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayme
         });
         payments["processing"] = processing
         let paid = {}
-        const paidSnapshot =  await getDocs(query(paymentsCol, where("paid", "==", true)));
+        const paidSnapshot =  await getDocs(query(paymentsCol, where("paid", "==", "true")));
         paidSnapshot.forEach((paymentDoc) => {
             unpaid[paymentDoc.id] = paymentDoc.data()
         });
