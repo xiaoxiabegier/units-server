@@ -9,23 +9,27 @@ export default async function handler(req, res){
     if(req.method === "PUT") {
         res.status(200).json("PUT ME IF YOU CAN!")
     }
-    const {includefields, omitfields, propertyid} = req.headers
+    const {includefields, omitfields, propertyid, includepayments} = req.headers
 
     let propertyIDArray = []
     let omitFieldsArray = []
     let includeFieldsArray = []
+    let includePayments = false
+
 
     if(typeof propertyid != "undefined")  propertyIDArray = propertyid.split(',')
     if(typeof omitfields != "undefined") omitFieldsArray = omitfields.split(',')
     if(typeof includefields != "undefined") includeFieldsArray = includefields.split(',')
+    if(typeof includepayments != "undefined") includePayments = true
 
-    let returnObj = await getAppropriateDocs(propertyIDArray, includeFieldsArray,omitFieldsArray )
+
+    let returnObj = await getAppropriateDocs(propertyIDArray, includeFieldsArray,omitFieldsArray, includePayments )
 
     res.status(200).json(returnObj)
 
 }
 
-async function getFields(doc, includeFieldsArray,  omitFieldsArray) {
+async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayments) {
 
 
     let returnObj = {}
@@ -39,6 +43,18 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray) {
         returnObj = doc.data()
     }
 
+    // add payments to obj
+    if (includePayments) {
+        const querySnapshot = await getDocs(collection(db, "units/"+doc.id+"/payments"));
+        let payments = {}
+        querySnapshot.forEach((paymentDoc) => {
+            payments[paymentDoc.id] = paymentDoc.data()
+        });
+        returnObj["payments"] = payments
+    }
+
+
+
     for(let elem in omitFieldsArray){
         delete returnObj[omitFieldsArray[elem]]
     }
@@ -46,14 +62,14 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray) {
     return returnObj
 }
 
-async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitFieldsArray){
+async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitFieldsArray, includePayments){
     let data = {}
 
     if(propertyIDArray.length === 0) {
         // GET ALL DOCS IN /UNITS
         const querySnapshot = await getDocs(collection(db, "units"));
         querySnapshot.forEach(async (doc) => {
-            data[doc.id] = await getFields(doc, includeFieldsArray, omitFieldsArray)
+            data[doc.id] = await getFields(doc, includeFieldsArray, omitFieldsArray, includePayments)
         });
     } else {
         // GET SPECIFIED DOCS
@@ -61,7 +77,7 @@ async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitField
             const docRef = doc(db, "units", propertyIDArray[propertyID]);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()){
-                data[docSnap.id] = await getFields(docSnap, includeFieldsArray, omitFieldsArray)
+                data[docSnap.id] = await getFields(docSnap, includeFieldsArray, omitFieldsArray, includePayments)
 }
         }
         }
