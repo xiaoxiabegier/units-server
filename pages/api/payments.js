@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     if(typeof propertyid != "undefined") propertyIDArray = propertyid.split(',')
 
 
+
     if (propertyIDArray.length !== 0) {
         const paymentsCol = query(collection(db, "payments"), where("propertyID", "in", propertyIDArray));
     }
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
 }
 
 
-function getFields(doc, includeFieldsArray,  omitFieldsArray) {
+export function getFields(doc, includeFieldsArray,  omitFieldsArray) {
     let returnObj = {}
     if (includeFieldsArray.length !== 0) {
         // GET SPECIFIED FIELDS
