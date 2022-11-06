@@ -1,5 +1,6 @@
 import { collection, getDocs , doc, getDoc, query, where} from "firebase/firestore";
 import {db} from "../../public/firebase";
+import {fetch} from "next/dist/compiled/@edge-runtime/primitives/fetch";
 export default async function handler(req, res){
 
     if(req.method === "POST") {
@@ -14,27 +15,25 @@ export default async function handler(req, res){
     let propertyIDArray = []
     let omitFieldsArray = []
     let includeFieldsArray = []
-    let includePayments = false
     
     if(typeof propertyid != "undefined")  propertyIDArray = propertyid.split(',')
     if(typeof omitfields != "undefined") omitFieldsArray = omitfields.split(',')
     if(typeof includefields != "undefined") includeFieldsArray = includefields.split(',')
-    if(typeof includepayments != "undefined") includePayments = true
 
-    let returnObj = await getAppropriateDocs(propertyIDArray, includeFieldsArray,omitFieldsArray, includePayments )
+    let returnObj = await getAppropriateDocs(propertyIDArray, includeFieldsArray,omitFieldsArray )
 
     res.status(200).json(returnObj)
 
 }
 
-async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitFieldsArray, includePayments){
+async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitFieldsArray){
     let data = {}
 
     if(propertyIDArray.length === 0) {
         // GET ALL DOCS IN /UNITS
         const querySnapshot = await getDocs(collection(db, "units"));
         querySnapshot.forEach(async (doc) => {
-            data[doc.id] = await getFields(doc, includeFieldsArray, omitFieldsArray, includePayments)
+            data[doc.id] = await getFields(doc, includeFieldsArray, omitFieldsArray)
         });
     } else {
         // GET SPECIFIED DOCS
@@ -42,13 +41,12 @@ async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitField
             const docRef = doc(db, "units", propertyIDArray[propertyID]);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()){
-                data[docSnap.id] = await getFields(docSnap, includeFieldsArray, omitFieldsArray, includePayments)
+                data[docSnap.id] = await getFields(docSnap, includeFieldsArray, omitFieldsArray)
 }
         }
         }
     return data
 }
-
 
 async function getFields(doc, includeFieldsArray,  omitFieldsArray) {
     let returnObj = {}
@@ -63,34 +61,8 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray) {
     for(let elem in omitFieldsArray){
         delete returnObj[omitFieldsArray[elem]]
     }
-
     return returnObj
 }
-    // add payments to obj
-//    if (includePayments) {
-//        const paymentsCol =collection(db, "units/"+doc.id+"/payments")
-//        const unpaidSnapshot = await getDocs(query(paymentsCol, where("status", "==", "unpaid")));
-//        let payments = {}
-//        let unpaid = {}
-//        unpaidSnapshot.forEach((paymentDoc) => {
-//            unpaid[paymentDoc.id] = paymentDoc.data()
-//        });
-//        payments["unpaid"] = unpaid
-//
-//        let processing = {}
-//        const processingSnapshot = await getDocs(query(paymentsCol, where("status", "==", "processing")));
-//        processingSnapshot.forEach((paymentDoc) => {
-//            processing[paymentDoc.id] = paymentDoc.data()
-//        });
-//        payments["processing"] = processing
-//        let paid = {}
-//        const paidSnapshot =  await getDocs(query(paymentsCol, where("paid", "==", true)));
-//        paidSnapshot.forEach((paymentDoc) => {
-//            paid[paymentDoc.id] = paymentDoc.data()
-//        });
-//        payments["paid"] = paid
-//
-//        returnObj["payments"] = payments
-//    }
-//
+
+
 
