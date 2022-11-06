@@ -50,7 +50,7 @@ async function getAppropriateDocs(propertyIDArray, includeFieldsArray, omitField
 }
 
 
-async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayments) {
+async function getFields(doc, includeFieldsArray,  omitFieldsArray) {
     let returnObj = {}
     if (includeFieldsArray.length !== 0) {
         // GET SPECIFIED FIELDS
