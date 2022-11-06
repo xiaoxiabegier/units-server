@@ -12,6 +12,8 @@ export default async function handler(req, res) {
     if(typeof omitfields != "undefined") omitFieldsArray = omitfields.split(',')
     if(typeof propertyid != "undefined") propertyIDArray = includefields.split(',')
 
+    
+
     res.status(200).json("lost in darkness")
 
 }

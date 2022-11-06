@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyA3vX6rlSeg-mBJ--ZJt6Z7FsqeK_nPhj0",
-    authDomain: "luminous-lambda-364207.firebaseapp.com",
-    projectId: "luminous-lambda-364207",
-    storageBucket: "luminous-lambda-364207.appspot.com",
-    messagingSenderId: "518969290682",
-    appId: "1:518969290682:web:0ed4fde6c877da0fd4f783"
+  apiKey: "AIzaSyAiGmFgzS1HJefVKV-r8El-t7q3kZYXccU",
+  authDomain: "cybernetic-stream.firebaseapp.com",
+  projectId: "cybernetic-stream",
+  storageBucket: "cybernetic-stream.appspot.com",
+  messagingSenderId: "134129148133",
+  appId: "1:134129148133:web:875effc1d9117b0516f40c"
 };
 
 // Initialize Firebase

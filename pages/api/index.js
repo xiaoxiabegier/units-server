@@ -15,8 +15,7 @@ export default async function handler(req, res){
     let omitFieldsArray = []
     let includeFieldsArray = []
     let includePayments = false
-
-
+    
     if(typeof propertyid != "undefined")  propertyIDArray = propertyid.split(',')
     if(typeof omitfields != "undefined") omitFieldsArray = omitfields.split(',')
     if(typeof includefields != "undefined") includeFieldsArray = includefields.split(',')
@@ -61,38 +60,37 @@ async function getFields(doc, includeFieldsArray,  omitFieldsArray, includePayme
     } else {
         returnObj = doc.data()
     }
-    // add payments to obj
-    if (includePayments) {
-        const paymentsCol =collection(db, "units/"+doc.id+"/payments")
-        const unpaidSnapshot = await getDocs(query(paymentsCol, where("status", "==", "unpaid")));
-        let payments = {}
-        let unpaid = {}
-        unpaidSnapshot.forEach((paymentDoc) => {
-            unpaid[paymentDoc.id] = paymentDoc.data()
-        });
-        payments["unpaid"] = unpaid
-
-        let processing = {}
-        const processingSnapshot = await getDocs(query(paymentsCol, where("status", "==", "unpaid")));
-        processingSnapshot.forEach((paymentDoc) => {
-            unpaid[paymentDoc.id] = paymentDoc.data()
-        });
-        payments["processing"] = processing
-        let paid = {}
-        const paidSnapshot =  await getDocs(query(paymentsCol, where("paid", "==", "true")));
-        paidSnapshot.forEach((paymentDoc) => {
-            unpaid[paymentDoc.id] = paymentDoc.data()
-        });
-        payments["paid"] = paid
-
-        returnObj["payments"] = payments
-    }
-
-
-
     for(let elem in omitFieldsArray){
         delete returnObj[omitFieldsArray[elem]]
     }
 
     return returnObj
 }
+    // add payments to obj
+//    if (includePayments) {
+//        const paymentsCol =collection(db, "units/"+doc.id+"/payments")
+//        const unpaidSnapshot = await getDocs(query(paymentsCol, where("status", "==", "unpaid")));
+//        let payments = {}
+//        let unpaid = {}
+//        unpaidSnapshot.forEach((paymentDoc) => {
+//            unpaid[paymentDoc.id] = paymentDoc.data()
+//        });
+//        payments["unpaid"] = unpaid
+//
+//        let processing = {}
+//        const processingSnapshot = await getDocs(query(paymentsCol, where("status", "==", "processing")));
+//        processingSnapshot.forEach((paymentDoc) => {
+//            processing[paymentDoc.id] = paymentDoc.data()
+//        });
+//        payments["processing"] = processing
+//        let paid = {}
+//        const paidSnapshot =  await getDocs(query(paymentsCol, where("paid", "==", true)));
+//        paidSnapshot.forEach((paymentDoc) => {
+//            paid[paymentDoc.id] = paymentDoc.data()
+//        });
+//        payments["paid"] = paid
+//
+//        returnObj["payments"] = payments
+//    }
+//
+
