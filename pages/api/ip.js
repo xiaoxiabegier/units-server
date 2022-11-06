@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import {db} from "../../public/firebase";
-import {getFields} from "./payments";
+import {getFields} from "./p";
 
 
 export default async function handler(req, res) {
