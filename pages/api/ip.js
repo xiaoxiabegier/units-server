@@ -10,18 +10,15 @@ export default async function handler(req, res) {
     let omitFieldsArray = []
     let propertyIDArray = []
 
-
-
     if(typeof includefields != "undefined")  includeFieldsArray = includefields.split(',')
     if(typeof omitfields != "undefined") omitFieldsArray = omitfields.split(',')
     if(typeof propertyid != "undefined") propertyIDArray = propertyid.split(',')
 
-
-
     let colRef = collection(db, "payments")
 
+    console.log(propertyIDArray)
     if(propertyIDArray.length !== 0){
-        colRef =query(colRef, where("propertyID", "in", propertyIDArray), orderBy("timestamps.dateAdded"))
+        colRef = query(colRef, where("propertyID", "in", propertyIDArray), orderBy("timestamps.dateAdded"))
     } else {
         colRef = query(colRef, orderBy("timestamps.dateAdded"))
     }

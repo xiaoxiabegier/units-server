@@ -60,7 +60,6 @@ export default async function handler(req, res) {
 
 }
 
-
 export function getFields(doc, includeFieldsArray,  omitFieldsArray) {
     let returnObj = {}
     if (includeFieldsArray.length !== 0) {
